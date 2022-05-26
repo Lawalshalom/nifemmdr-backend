@@ -1,8 +1,22 @@
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
-const uuid = require("uuidv4").uuid;
+const nodemailer = require("nodemailer");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 const POSTS = require("../models/Posts");
+
+const transporter = nodemailer.createTransport({
+	service: "gmail",
+	pool: true,
+	maxConnections: 5,
+	maxMessages: 50,
+	auth: {
+		user: process.env.USER_EMAIL,
+		pass: process.env.EMAIL_PASSWORD,
+	},
+});
 
 router.post("/new", verifyToken, (req, res) => {
 	jwt.verify(req.token, "secretonesharekey", (err, authData) => {
@@ -65,6 +79,40 @@ router.post("/delete", verifyToken, (req, res) => {
 					});
 				}
 			});
+		}
+	});
+});
+
+router.post("/message", (req, res) => {
+	const { name, email, subject, message } = req.body;
+	const mailOptions = {
+		from: name,
+		to: "nifemmdr@gmail.com",
+		subject,
+		text: `
+		Hello admin, you have a new message from ${email}.
+
+		The message is rendered below:
+
+		${message}.
+
+		Kindly send a reply to ${email}.
+
+		Thank you.
+		`,
+	};
+
+	transporter.sendMail(mailOptions, function (error, info) {
+		if (error) {
+			console.log(error);
+			return res
+				.status(500)
+				.json({ success: false, message: "message not sent. Try again" });
+		} else {
+			console.log("Email sent: " + info.response);
+			return res
+				.status(200)
+				.json({ success: true, message: "message sent successfully" });
 		}
 	});
 });
