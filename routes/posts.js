@@ -47,18 +47,14 @@ router.post("/edit", verifyToken, (req, res) => {
 		} else {
 			POSTS.findOneAndUpdate(
 				{ _id },
-				{ header: req.body.header, posts: req.body.posts },
+				{
+					header: req.body.header,
+					posts: req.body.posts,
+					pictures: req.body.pictures,
+				},
 				(err, post) => {
 					if (err) return res.status(200).json({ error: err.message, err });
 					if (post) return res.status(200).json({ success: true, post });
-
-					// if (post) {
-					// 	const newPost = { ...post, ...req.body };
-					// 	newPost.save().then((err, post) => {
-					// 		if (err) return res.status(200).json({ error: err.message, err });
-					// 		if (post) return res.status(200).json({ success: true, post });
-					// 	});
-					// }
 				}
 			);
 		}

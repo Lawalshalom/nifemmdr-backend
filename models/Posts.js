@@ -9,6 +9,10 @@ const postSchema = new mongoose.Schema({
 		type: [mongoose.Schema.Types.Mixed],
 		required: true,
 	},
+	pictures: {
+		type: [mongoose.Schema.Types.Mixed],
+		required: false,
+	},
 	page: {
 		type: String,
 		required: true,
